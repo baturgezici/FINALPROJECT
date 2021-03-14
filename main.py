@@ -21,8 +21,3 @@ def CNN():
 
     adamOptimizer = keras.optimizers.Adam(lr=0.001)
     modelCNN.compile(optimizer=adamOptimizer, loss='categorical_crossentropy', metrics=['accuracy'])
-
-    
-    cnnModelFolder = str(colors) + ' Colors Model/'
-    cnnFileName = cnnModelFolder + "cnnmodel-{epoch:02d}-{loss:.4f}.hdf5"
-    cnnCheckpoint = ModelCheckpoint(cnnFileName, verbose = 1, save_best_only = False, save_weights_only = False, period = 1)
