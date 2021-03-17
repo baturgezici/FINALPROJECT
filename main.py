@@ -1,5 +1,10 @@
 from flask import Flask, render_template, redirect, url_for, request
+import pymongo
 app = Flask(__name__)
+
+myclient = pymongo.MongoClient("mongodb://localhost:27017/")
+mydb = myclient["admin"]
+mycol = mydb["User"]
 
 @app.route('/')
 def home():
@@ -13,6 +18,9 @@ def welcome():
 def login():
     error = None
     if request.method == 'POST':
+        myq = {"username":request.form['username']}
+        a = mycol.find(myq).count() > 0
+        print(a)
         if request.form['username'] != 'admin' or request.form['password'] != 'admin':
             error = 'Invalid Credentials. Please try again.'
         else:
