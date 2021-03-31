@@ -2,6 +2,7 @@ from flask import Flask, render_template, redirect, url_for, request, session
 import pymongo
 
 app = Flask(__name__)
+app.secret_key="abdulhalukbaturgezici"
 
 myclient = pymongo.MongoClient("mongodb://localhost:27017/")
 mydb = myclient["admin"]
@@ -11,6 +12,10 @@ mycol = mydb["User"]
 def home():
     return "Hello, World!"  # return a string
 
+@app.route('/userpage')
+def userpage():
+    return render_template('userpage.html')
+
 @app.route('/welcome')
 def welcome():
     return render_template('welcome.html')  # render a template
@@ -19,13 +24,9 @@ def welcome():
 def login():
     error = None
     if request.method == 'POST':
-        myq = {"username":request.form['username']}
-        a = mycol.find()[0]
-        print(a)
-        if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-            error = 'Invalid Credentials. Please try again.'
-        else:
-            return redirect(url_for('home'))
+        myq = {"username":request.form['username'],"password":request.form['password']}
+        if mycol.find(myq).count() > 0:
+            return render_template('userpage.html', username = request.form['username'])
     return render_template('login.html', error=error)
 
 @app.route("/signup", methods=['GET', 'POST'])
@@ -34,7 +35,10 @@ def signup():
     if request.method == 'POST':
         newuser = {"username": request.form['username'], "password": request.form['password'], "email": request.form['email']}
         x = mycol.insert_one(newuser)
-    return render_template('signup.html', error=error)
+        session["username"] = request.form['username']
+        y = session["username"]
+        return render_template('userpage.html', username=y)
+    return render_template('signup.html')
 
 if __name__ == '__main__':
     app.run()
